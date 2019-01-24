@@ -122,7 +122,10 @@ namespace ngraph
             NodeVector result;
             for (const auto& name : m_node_proto->input())
             {
-                result.push_back(m_graph->get_ng_node_from_cache(name));
+                if (name != "")
+                {
+                    result.push_back(m_graph->get_ng_node_from_cache(name));
+                }
             }
             return result;
         }
