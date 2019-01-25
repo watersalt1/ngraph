@@ -191,3 +191,13 @@ void Function::replace_node(std::shared_ptr<Node> old, std::shared_ptr<Node> rep
 {
     ngraph::replace_node(old, repl);
 }
+
+size_t Function::get_placement() const
+{
+    return m_placement;
+}
+
+void Function::set_placement(size_t placement)
+{
+    m_placement = placement;
+}
