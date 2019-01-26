@@ -22,6 +22,12 @@ if (WIN32)
     set(TBB_SHA1_HASH 1989458a49e780d76248edac13b963f80c9a460c)
 endif()
 
+if (APPLE)
+    set(ARCHIVE_FILE_BASE tbb2019_20181203oss)
+    set(TBB_FILE https://github.com/01org/tbb/releases/download/2019_U3/tbb2019_20181203oss_mac.tgz)
+    set(TBB_SHA1_HASH 36926fb46add578b88a5c7e19652b94bb612e4be)
+endif()
+
 ExternalProject_Add(
     ext_tbb
     URL ${TBB_FILE}
@@ -37,11 +43,17 @@ ExternalProject_Add(
 ExternalProject_Get_Property(ext_tbb SOURCE_DIR)
 set(SOURCE_DIR ${SOURCE_DIR}/${ARCHIVE_FILE_BASE})
 
-set(TBB_LINK_LIBS
-    ${SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}clangTooling${CMAKE_SHARED_LIBRARY_SUFFIX}
-    ${SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}clangTooling${CMAKE_SHARED_LIBRARY_SUFFIX}
-    ${SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}clangTooling${CMAKE_SHARED_LIBRARY_SUFFIX}
-)
+if (WIN32)
+    set(TBB_LINK_LIBS
+        ${SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}clangTooling${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+endif()
+
+if (APPLE)
+    set(TBB_LINK_LIBS
+        ${SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}tbb${CMAKE_SHARED_LIBRARY_SUFFIX}
+    )
+endif()
 
 add_library(libtbb INTERFACE)
 add_dependencies(libtbb ext_tbb)
