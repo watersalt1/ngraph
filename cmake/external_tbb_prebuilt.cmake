@@ -16,15 +16,12 @@
 
 include(ExternalProject)
 
+set(ARCHIVE_FILE_BASE tbb2019_20181203oss)
 if (WIN32)
-    set(ARCHIVE_FILE_BASE tbb2019_20181203oss)
     set(TBB_FILE https://github.com/01org/tbb/releases/download/2019_U3/${ARCHIVE_FILE_BASE}_win.zip)
     set(TBB_SHA1_HASH 1989458a49e780d76248edac13b963f80c9a460c)
-endif()
-
-if (APPLE)
-    set(ARCHIVE_FILE_BASE tbb2019_20181203oss)
-    set(TBB_FILE https://github.com/01org/tbb/releases/download/2019_U3/tbb2019_20181203oss_mac.tgz)
+elseif(APPLE)
+    set(TBB_FILE https://github.com/01org/tbb/releases/download/2019_U3/${ARCHIVE_FILE_BASE}_mac.tgz)
     set(TBB_SHA1_HASH 36926fb46add578b88a5c7e19652b94bb612e4be)
 endif()
 
