@@ -44,12 +44,31 @@ if (WIN32)
     set(TBB_LINK_LIBS
         ${SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}clangTooling${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
-endif()
-
-if (APPLE)
+elseif(APPLE)
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(TBB_LIB_NAME tbb_debug)
+    else()
+        set(TBB_LIB_NAME tbb)
+    endif()
     set(TBB_LINK_LIBS
-        ${SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}tbb${CMAKE_SHARED_LIBRARY_SUFFIX}
+        ${SOURCE_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${TBB_LIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
+
+    set_target_properties(ext_tbb PROPERTIES
+        SKIP_BUILD_RPATH  FALSE
+
+        # when building, don't use the install RPATH already
+        # (but later on when installing)
+        BUILD_WITH_INSTALL_RPATH FALSE
+
+        INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+
+        # add the automatically determined parts of the RPATH
+        # which point to directories outside the build tree to the install RPATH
+        INSTALL_RPATH_USE_LINK_PATH TRUE
+    )
+
+    set(CMAKE_INSTALL_RPATH = "${SOURCE_DIR}/lib;${CMAKE_INSTALL_PATH}")
 endif()
 
 add_library(libtbb INTERFACE)
