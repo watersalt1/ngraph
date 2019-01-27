@@ -16,10 +16,17 @@
 
 #pragma once
 
+#include <memory> // std::shared_ptr
+#include <vector> // std::vector
+
+#include <onnxifi.h>
+
 #include "ngraph/function.hpp"
 
 #include "backend.hpp"
 #include "span.hpp"
+#include "tensor.hpp"
+#include "weight.hpp"
 
 namespace ngraph
 {
@@ -47,6 +54,11 @@ namespace ngraph
             void set_inputs(const Span<::onnxTensorDescriptorV1>& inputs);
             void set_outputs(const Span<::onnxTensorDescriptorV1>& outputs);
 
+            void configure_memory_fences(const ::onnxMemoryFenceV1* input_fence,
+                                         ::onnxMemoryFenceV1* output_fence);
+
+            bool run_graph();
+
             void from_ng_outputs(const std::vector<std::shared_ptr<runtime::Tensor>>& ng_outputs,
                                  std::vector<Tensor>& output) const
             {
@@ -62,6 +74,8 @@ namespace ngraph
             std::vector<Tensor> m_outputs{};
             std::vector<std::shared_ptr<runtime::Tensor>> m_ng_outputs{};
             const Backend* m_backend;
+            const ::onnxMemoryFenceV1* m_input_fence{nullptr};
+            ::onnxMemoryFenceV1* m_output_fence{nullptr};
         };
 
     } // namespace onnxifi
