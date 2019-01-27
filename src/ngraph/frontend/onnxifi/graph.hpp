@@ -16,7 +16,10 @@
 
 #pragma once
 
+#include "ngraph/function.hpp"
+
 #include "backend.hpp"
+#include "span.hpp"
 
 namespace ngraph
 {
@@ -39,7 +42,10 @@ namespace ngraph
             {
             }
 
+            void load(std::istream& sin, const Span<::onnxTensorDescriptorV1>& weights);
+
         private:
+            runtime::Handle m_handle{nullptr};
             const Backend* m_backend;
         };
 
