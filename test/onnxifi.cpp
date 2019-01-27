@@ -15,6 +15,7 @@
 //*****************************************************************************
 
 #include <cstring>
+#include <fstream>
 #include <vector>
 
 #include <gtest/gtest.h>
@@ -631,4 +632,53 @@ TEST(onnxifi, init_backend_invalid_pointer)
         ::onnxStatus status{::onnxInitBackend(id, nullptr, nullptr)};
         EXPECT_TRUE(status == ONNXIFI_STATUS_INVALID_POINTER);
     }
+}
+
+// ===============================================[ onnxReleaseBackend ]=======
+
+namespace
+{
+    class InitializedBackends : public std::vector<::onnxBackend>
+    {
+    public:
+        InitializedBackends()
+        {
+            auto backend_ids = get_backend_ids();
+            for (const auto& backend_id : backend_ids)
+            {
+                ::onnxBackend backend;
+                ::onnxStatus status{::onnxInitBackend(backend_id, nullptr, &backend)};
+                if (status != ONNXIFI_STATUS_SUCCESS)
+                {
+                    throw error::status{status};
+                }
+                push_back(backend);
+            }
+        }
+        ~InitializedBackends()
+        {
+            for (const auto& backend : *this)
+            {
+                // Read the status, but ignore it. For some tests the backends
+                // might be already released.
+                ::onnxStatus(status) = ::onnxReleaseBackend(backend);
+            }
+        }
+    };
+}
+
+TEST(onnxifi, release_backend)
+{
+    InitializedBackends backends{};
+    for (auto& backend : backends)
+    {
+        ::onnxStatus status{::onnxReleaseBackend(backend)};
+        EXPECT_TRUE(status == ONNXIFI_STATUS_SUCCESS);
+    }
+}
+
+TEST(onnxifi, release_backend_invalid_backend)
+{
+    ::onnxStatus status{::onnxReleaseBackend(nullptr)};
+    EXPECT_TRUE(status == ONNXIFI_STATUS_INVALID_BACKEND);
 }
